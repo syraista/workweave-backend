@@ -17,6 +17,39 @@ async function getUserData(userId) {
   }
 }
 
+async function getUserDataByWorkerId(workerId) {
+  try {
+    const [rows] = await pool.query(
+      `SELECT 
+        User.id,
+        User.name,
+        User.username,
+        User.email,
+        User.role,
+        User.jenis_kelamin,
+        User.birth_date,
+        User.profile_picture,
+        User.phone_number,
+        User.bio,
+        User.address,
+        User.created_at,
+        User.updated_at,
+        Worker.rating
+      FROM 
+        Worker
+      JOIN 
+        User ON Worker.id = User.id
+      WHERE 
+        Worker.id = ?`, [workerId]
+    );
+
+    return rows.length ? rows[0] : null;
+  } catch (error) {
+    console.error('Error while getting user data by worker ID', error);
+    throw error;
+  }
+}
+
 async function updateUser(userId, body) {
   const updatedAt = moment().format('YYYY-MM-DD HH:mm:ss');
 
@@ -90,6 +123,7 @@ async function getApplicationByWorkerId(workerId) {
 
 module.exports = {
   getUserData,
+  getUserDataByWorkerId,
   updateUser,
   getWorkerDataByProjectId,
   getApplicationByWorkerId

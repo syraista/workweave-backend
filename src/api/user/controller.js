@@ -1,6 +1,7 @@
 const { body, param, validationResult } = require('express-validator');
 const {
   getUserData,
+  getUserDataByWorkerId,
   updateUser,
   getWorkerDataByProjectId,
   getApplicationByWorkerId
@@ -24,6 +25,29 @@ const getUserDataHandler = [
     } catch (error) {
       console.error('Error while getting user data', error.message);
       next({ status: "error", message: "Unable to communicate with database" });
+    }
+  }
+];
+
+const getUserDataByWorkerIdHandler = [
+  // Validate worker ID
+  param('workerId').isUUID().withMessage('Worker ID must be a valid UUID'),
+
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ status: "error", errors: errors.array() });
+    }
+
+    try {
+      const userData = await getUserDataByWorkerId(req.params.workerId);
+      if (!userData) {
+        return res.status(404).json({ status: "error", message: "Worker not found" });
+      }
+      res.status(200).json({ status: "success", data: userData });
+    } catch (error) {
+      console.error('Error while getting user data by worker ID', error.message);
+      res.status(500).json({ status: "error", message: "Internal server error" });
     }
   }
 ];
@@ -107,6 +131,7 @@ const getApplicationByWorkerIdHandler = [
 
 module.exports = {
   getUserDataHandler,
+  getUserDataByWorkerIdHandler,
   updateUserHandler,
   getWorkerDataByProjectIdHandler,
   getApplicationByWorkerIdHandler
