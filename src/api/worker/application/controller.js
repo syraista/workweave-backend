@@ -50,6 +50,8 @@ const getApplicationByApplicationIdHandler = [
   }
 ];
 
+
+
 const applyProjectHandler = [
   // Input validation
   param('projectId').isUUID().withMessage('Project ID must be a valid UUID'),

@@ -78,8 +78,19 @@ async function getWorkerDataByProjectId(projectId) {
   }
 }
 
+async function getApplicationByWorkerId(workerId) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM Application WHERE worker_id = ?', [workerId]);
+    return emptyOrRows(rows);
+  } catch (error) {
+    console.error('Error while retrieving application by worker ID', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getUserData,
   updateUser,
-  getWorkerDataByProjectId
+  getWorkerDataByProjectId,
+  getApplicationByWorkerId
 };

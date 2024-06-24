@@ -2,7 +2,8 @@ const { body, param, validationResult } = require('express-validator');
 const {
   getUserData,
   updateUser,
-  getWorkerDataByProjectId
+  getWorkerDataByProjectId,
+  getApplicationByWorkerId
 } = require('./service');
 
 const getUserDataHandler = [
@@ -81,8 +82,32 @@ const getWorkerDataByProjectIdHandler = [
   }
 ];
 
+const getApplicationByWorkerIdHandler = [
+  param('workerId').isUUID().withMessage('Worker ID must be a valid UUID'),
+
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ status: "error", errors: errors.array() });
+    }
+
+    try {
+      const application = await getApplicationByWorkerId(req.params.workerId);
+      if (application) {
+        res.status(200).json({ status: "success", data: { application } });
+      } else {
+        res.status(404).json({ status: "error", message: "Worker not found" });
+      }
+    } catch (error) {
+      console.error('Error while getting application by Worker ID', error.message);
+      next({ status: "error", message: "Unable to communicate with database" });
+    }
+  }
+];
+
 module.exports = {
   getUserDataHandler,
   updateUserHandler,
-  getWorkerDataByProjectIdHandler
+  getWorkerDataByProjectIdHandler,
+  getApplicationByWorkerIdHandler
 };
