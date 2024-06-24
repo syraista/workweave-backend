@@ -29,7 +29,7 @@ async function getProjectById(params) {
 
 async function getProjectsByClientId(params) {
   try {
-    console.log(params);
+    // console.log(params);
     const [rows] = await pool.query(
       `SELECT id, client_id, title, description, status, document_url, category, budget_lower, budget_upper, deadline, created_at, updated_at FROM project WHERE client_id = ?`, [params]
     );
